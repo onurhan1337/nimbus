@@ -1,29 +1,55 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { RouterLink } from 'vue-router'
 import { supabase } from './lib/supabaseClient'
+import AuthView from './views/AuthView.vue'
+import HomeView from './views/HomeView.vue'
 
-interface Country {
-  id: number
-  name: string
-}
+const session = ref()
 
-const countries = ref<Country[]>([])
-
-async function getCountries() {
-  const { data } = await supabase.from('countries').select()
-  countries.value = (data as Country[]) || []
+const logout = () => {
+  supabase.auth.signOut()
 }
 
 onMounted(() => {
-  getCountries()
+  supabase.auth.getSession().then(({ data }) => {
+    session.value = data.session
+  })
+
+  supabase.auth.onAuthStateChange((_, _session) => {
+    session.value = _session
+  })
 })
 </script>
 
 <template>
-  <ul>
-    <li v-for="country in countries" :key="country.id">
-      {{ country.name }}
-    </li>
-    <button v-if="countries.length === 0" @click="getCountries">Add new country</button>
-  </ul>
+  <nav class="flex items-center gap-4">
+    <RouterLink to="/">Home</RouterLink>
+    <RouterLink to="/about">About</RouterLink>
+    <RouterLink to="/register">Register</RouterLink>
+    <button
+      @click="logout"
+      v-if="session"
+      class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded inline-flex items-center"
+    >
+      Logout
+    </button>
+  </nav>
+
+  <HomeView v-if="session" :session="session" />
+  <AuthView v-else />
 </template>
+
+<style>
+nav {
+  background-color: #eee;
+  padding: 1rem;
+}
+
+nav a {
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+  margin-right: 1rem;
+}
+</style>
