@@ -1,11 +1,17 @@
-<script setup>
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import { supabase } from './lib/supabaseClient'
 
-const countries = ref([])
+interface Country {
+  id: number
+  name: string
+}
+
+const countries = ref<Country[]>([])
 
 async function getCountries() {
   const { data } = await supabase.from('countries').select()
-  countries.value = data
+  countries.value = (data as Country[]) || []
 }
 
 onMounted(() => {
@@ -16,5 +22,6 @@ onMounted(() => {
 <template>
   <ul>
     <li v-for="country in countries" :key="country.id">{{ country.name }}</li>
+    <button v-if="countries.length === 0" @click="getCountries">Add new country</button>
   </ul>
 </template>
