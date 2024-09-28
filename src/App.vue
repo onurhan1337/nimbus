@@ -21,7 +21,9 @@ onMounted(() => {
 
 <template>
   <ul>
-    <li v-for="country in countries" :key="country.id">{{ country.name }}</li>
+    <li v-for="country in countries" :key="country.id">
+      {{ country.name }}
+    </li>
     <button v-if="countries.length === 0" @click="getCountries">Add new country</button>
   </ul>
 </template>
