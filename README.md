@@ -1,6 +1,4 @@
-TODO
+### TODO
 
-[ ] Add Login form
-[ ] Add navbar
-[ ] Check if user is logged in and redirect to home page
-[ ] Add toast notifications for info and errors
+[] Build simple admin panel
+[] Update the user meta data after sign up. Add role information.
