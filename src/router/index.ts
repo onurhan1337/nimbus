@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import { useAuthStore } from '../stores/auth' // Make sure this path is correct
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,15 +13,13 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue')
     },
     {
       path: '/auth',
       name: 'auth',
-      component: () => import('../views/AuthView.vue')
+      component: () => import('../views/AuthView.vue'),
+      meta: { requiresGuest: true }
     },
     {
       path: '/:pathMatch(.*)*',
@@ -28,6 +27,22 @@ const router = createRouter({
       component: () => import('../views/NotFound.vue')
     }
   ]
+})
+
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
+
+  // Check the session status
+  await authStore.checkSession()
+
+  if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    // If the route requires a guest (unauthenticated) user and the user is authenticated,
+    // redirect to the home page
+    next({ name: 'home' })
+  } else {
+    // Otherwise, allow navigation to proceed
+    next()
+  }
 })
 
 export default router

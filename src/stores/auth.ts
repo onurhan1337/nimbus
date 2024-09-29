@@ -39,7 +39,7 @@ export const useAuthStore = defineStore('auth', () => {
     else {
       user.value = null
       await checkSession()
-      router.push('/')
+      router.push('/auth')
     }
   }
 
