@@ -5,8 +5,10 @@ import { supabase } from '@/lib/supabaseClient'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
+  const isAdmin = ref(false)
   const router = useRouter()
 
+  const checkAdmin = computed(() => isAdmin.value)
   const isAuthenticated = computed(() => !!user.value)
 
   async function login() {
@@ -44,14 +46,27 @@ export const useAuthStore = defineStore('auth', () => {
     else {
       user.value = null
       await checkSession()
-      router.push('/auth')
+      router.push('/')
     }
   }
 
   async function checkSession() {
     const { data } = await supabase.auth.getSession()
     user.value = data.session?.user || null
+    if (user.value) await checkUserIsAdmin()
+    else isAdmin.value = false
   }
 
-  return { user, isAuthenticated, login, register, logout, checkSession }
+  async function checkUserIsAdmin() {
+    const { data } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.value.id)
+      .single()
+
+    if (data.is_admin) isAdmin.value = true
+    else isAdmin.value = false
+  }
+
+  return { user, isAuthenticated, login, register, logout, checkSession, checkAdmin }
 })
