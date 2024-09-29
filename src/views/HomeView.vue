@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref, toRefs } from 'vue'
+import { onMounted, ref } from 'vue'
 import { supabase } from '../lib/supabaseClient'
-
-const props = defineProps(['session'])
-const { session } = toRefs(props)
 
 interface Country {
   id: number
@@ -23,13 +20,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="session">
-    <ul>
-      <li v-for="country in countries" :key="country.id">
-        {{ country.name }}
-      </li>
-      <button v-if="countries.length === 0" @click="getCountries">Add new country</button>
-    </ul>
-  </div>
-  <RouterLink to="/register" v-else />
+  <ul>
+    <li v-for="country in countries" :key="country.id">
+      {{ country.name }}
+    </li>
+  </ul>
 </template>
