@@ -1,9 +1,6 @@
 <template>
   <header class="bg-zinc-50">
-    <nav
-      class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
-      aria-label="Global"
-    >
+    <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
       <div class="flex lg:flex-1">
         <a href="#" class="-m-1.5 p-1.5 font-serif font-semibold">🧿 nimbus</a>
       </div>
@@ -29,10 +26,18 @@
       </PopoverGroup>
       <div class="hidden lg:flex lg:flex-1 lg:justify-end">
         <RouterLink
-          to="/login"
-          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-          >Log in <span aria-hidden="true">&rarr;</span></RouterLink
+          v-if="!authStore.isAuthenticated"
+          to="/auth"
+          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none"
+          >Login <span aria-hidden="true">&rarr;</span></RouterLink
         >
+        <button
+          v-else
+          @click="authStore.logout"
+          class="text-zinc-500 bg-zinc-200 border border-zinc-300 hover:bg-zinc-300 focus:ring-2 focus:ring-zinc-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none"
+        >
+          Logout
+        </button>
       </div>
     </nav>
     <Dialog class="lg:hidden" @close="mobileMenuOpen = false" :open="mobileMenuOpen">
@@ -63,10 +68,18 @@
             </div>
             <div class="py-6">
               <RouterLink
-                to="/login"
-                class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                >Log in</RouterLink
+                v-if="!authStore.isAuthenticated"
+                to="/auth"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none"
+                >Login <span aria-hidden="true">&rarr;</span></RouterLink
               >
+              <button
+                v-else
+                @click="authStore.logout"
+                class="text-zinc-500 bg-zinc-200 border border-zinc-300 hover:bg-zinc-300 focus:ring-2 focus:ring-zinc-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>
@@ -76,15 +89,22 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/auth'
 import { Dialog, DialogPanel, PopoverGroup } from '@headlessui/vue'
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 const mobileMenuOpen = ref(false)
+
+const authStore = useAuthStore()
 
 const NAV_ITEMS = [
   { name: 'Home', href: '/' },
   { name: 'Blogs', href: '/blogs' }
 ]
+
+onMounted(async () => {
+  await authStore.checkSession()
+})
 </script>
