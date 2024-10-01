@@ -30,6 +30,14 @@ const router = createRouter({
       }
     },
     {
+      path: '/admin/blogs/create',
+      name: 'create-blog',
+      component: () => import('../views/admin/blogs/CreateView.vue'),
+      meta: {
+        requiresAdmin: true
+      }
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
       component: () => import('../views/NotFound.vue')
