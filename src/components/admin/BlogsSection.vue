@@ -9,11 +9,12 @@
           <p class="mt-1 text-sm leading-6 text-gray-400">
             Here you can see all the blogs you have created. You can also edit or delete them.
           </p>
-          <button
+          <RouterLink
+            to="/admin/blogs/create"
             class="mt-6 inline-flex items-center justify-center rounded-md border border-transparent bg-zinc-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 sm:text-base"
           >
             Write a new blog
-          </button>
+          </RouterLink>
         </div>
 
         <!-- TODO: Add a blogs list vertically here -->
