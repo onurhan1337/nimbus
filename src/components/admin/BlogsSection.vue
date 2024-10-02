@@ -17,26 +17,104 @@
           </RouterLink>
         </div>
 
-        <!-- TODO: Add a blogs list vertically here -->
-        <form class="md:col-span-2">
-          <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
-            <div class="col-span-full">
-              <label for="email" class="block text-sm font-medium leading-6 text-white"
-                >Email address</label
-              >
-              <div class="mt-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autocomplete="email"
-                  class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                />
+        <div class="md:col-span-2">
+          <div
+            v-for="blog in blogs"
+            :key="blog.id"
+            class="mb-8 p-4 rounded-lg border bg-gradient-to-br from-neutral-50 to-zinc-50"
+          >
+            <div class="w-full flex justify-end">
+              <DropdownMenuRoot>
+                <DropdownMenuTrigger class="flex items-center justify-between">
+                  <EllipsisHorizontalIcon class="h-5 w-5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuContent
+                    align="start"
+                    side="right"
+                    class="w-48 border rounded-sm bg-white shadow-lg"
+                  >
+                    <DropdownMenuItem
+                      class="w-full bg-zinc-100 hover:bg-zinc-200 focus:bg-zinc-100 focus:outline-none rounded-sm p-1 text-sm text-zinc-700 cursor-pointer"
+                      >Edit</DropdownMenuItem
+                    >
+                    <DropdownMenuItem v-on:select="(e) => e.preventDefault()">
+                      <RemoveBlogDialog :blogId="blog.id" />
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenuPortal>
+              </DropdownMenuRoot>
+            </div>
+            <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
+              <div class="col-span-full space-y-2">
+                <h2 class="text-2xl font-bold">{{ blog.title }}</h2>
+                <h6 class="text-sm text-zinc-500">
+                  {{ blog.content.author }} - {{ blog.created_at.split('T')[0] }}
+                </h6>
+                <div v-for="(tag, index) in blog.content.tags" :key="index">
+                  <span
+                    class="inline-block bg-zinc-100 text-zinc-700 border rounded-full px-3 py-1 text-xs font-semibold tracking-wide"
+                  >
+                    {{ tag }}
+                  </span>
+                </div>
+                <p class="mt-1 text-sm leading-6 text-gray-400">
+                  {{ blog.content.summary }}
+                </p>
               </div>
             </div>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+import { supabase } from '@/lib/supabaseClient'
+import { EllipsisHorizontalIcon } from '@heroicons/vue/24/outline'
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuRoot,
+  DropdownMenuTrigger
+} from 'radix-vue'
+import { onMounted, ref } from 'vue'
+
+interface Blog {
+  id: number
+  title: string
+  category_id: number
+  content: {
+    author: string
+    markdown: string
+    tags: string[]
+    summary: string
+    cover_image: string
+  }
+  user_id: number
+  created_at: string
+  updated_at: string
+}
+
+const loading = ref<boolean>(true)
+const blogs = ref<Blog[]>([])
+const error = ref<string | null>(null)
+
+async function getBlogs() {
+  try {
+    const { data, error: supabaseError } = await supabase.from('blogs').select('*')
+    if (supabaseError) throw supabaseError
+    blogs.value = data as Blog[]
+  } catch (e) {
+    error.value = (e as Error).message
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  getBlogs()
+})
+</script>
