@@ -15,15 +15,14 @@
         />
       </div>
 
-      <!-- Category ID -->
+      <!-- Category -->
       <div class="col-span-2 sm:col-span-1">
-        <label for="category_id" class="block text-sm font-medium text-gray-700">Category ID</label>
+        <label for="category_id" class="block text-sm font-medium text-gray-700">Category</label>
         <select
           v-bind="categoryIdAttrs"
           v-model="categoryId"
           id="category_id"
           class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-600 focus:border-blue-600 sm:text-sm"
-          placeholder="Enter category ID"
         >
           <option v-for="category in categories" :key="category.id" :value="category.id">
             {{ category.name }}
@@ -75,6 +74,7 @@
         ></textarea>
       </div>
 
+      <!-- TODO: Convert that Tags Input -->
       <!-- Tags -->
       <div class="col-span-2 sm:col-span-1">
         <label for="tags" class="block text-sm font-medium text-gray-700"
@@ -124,12 +124,13 @@ import type { User } from '@supabase/supabase-js'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { defineComponent, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import * as zod from 'zod'
 
 const blogSchema = zod.object({
   title: zod.string().min(3, 'Title must be at least 3 characters long.'),
-  category_id: zod.number().int().positive('Category ID must be a positive number.'),
+  category_id: zod.number().int().positive('Category must be a positive number.'),
   content: zod.object({
     author: zod.string().min(2, 'Author name must be at least 2 characters long.'),
     markdown: zod.string().min(10, 'Markdown content must be at least 10 characters long.'),
@@ -153,6 +154,7 @@ type Category = {
 export default defineComponent({
   name: 'BlogForm',
   setup() {
+    const router = useRouter()
     const authStore = useAuthStore()
 
     const categories = ref<Category[]>([])
@@ -209,6 +211,7 @@ export default defineComponent({
         if (error) throw error
 
         toast.success('Blog post created successfully!')
+        router.push('/admin/blogs')
       } catch (error) {
         toast.error('Error creating blog post!')
       }
