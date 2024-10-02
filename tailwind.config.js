@@ -1,4 +1,4 @@
-import { blackA, green, grass, mauve } from '@radix-ui/colors'
+import { blackA, green, grass, mauve, red } from '@radix-ui/colors'
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -6,10 +6,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        ...blackA,
+        ...mauve,
         ...green,
         ...grass,
-        ...mauve
+        ...blackA,
+        ...red
       },
       keyframes: {
         overlayShow: {
