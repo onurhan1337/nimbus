@@ -9,7 +9,9 @@ declare module 'vue' {
   export interface GlobalComponents {
     BlogsSection: typeof import('./src/components/admin/BlogsSection.vue')['default']
     CreateBlog: typeof import('./src/components/admin/CreateBlog.vue')['default']
+    DropdownMenuContent: typeof import('radix-vue')['DropdownMenuContent']
     NavBar: typeof import('./src/components/navBar.vue')['default']
+    RemoveBlogDialog: typeof import('./src/components/admin/RemoveBlogDialog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     UsersSection: typeof import('./src/components/admin/UsersSection.vue')['default']
