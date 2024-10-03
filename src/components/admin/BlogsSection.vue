@@ -46,7 +46,9 @@
                 </DropdownMenuPortal>
               </DropdownMenuRoot>
             </div>
-            <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
+            <div
+              class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6 overflow-hidden break-words whitespace-normal"
+            >
               <div class="col-span-full space-y-2">
                 <h2 class="text-2xl font-bold">{{ blog.title }}</h2>
                 <h6 class="text-sm text-zinc-500">
