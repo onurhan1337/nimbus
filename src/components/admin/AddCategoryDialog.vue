@@ -59,7 +59,7 @@ const onSubmit = handleSubmit(async (values: CategoryForm) => {
     if (error) throw error
 
     toast.success('Category added successfully!')
-    emit('category-added') // No need to pass data, parent will re-fetch
+    emit('category-added')
     handleClose()
   } catch (error) {
     console.error('Error adding category:', error)
@@ -74,7 +74,7 @@ const handleClose = () => {
 </script>
 
 <template>
-  <DialogRoot :open="props.open" @update:open="handleClose">
+  <DialogRoot :open="props.open" @update:open="handleClose" :modal="true">
     <DialogPortal>
       <DialogOverlay class="bg-blackA9 data-[state=open]:animate-overlayShow fixed inset-0 z-30" />
       <DialogContent
