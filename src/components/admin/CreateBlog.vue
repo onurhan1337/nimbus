@@ -211,7 +211,7 @@ export default defineComponent({
         if (error) throw error
 
         toast.success('Blog post created successfully!')
-        router.push('/admin/blogs')
+        router.push('/admin')
       } catch (error) {
         toast.error('Error creating blog post!')
       }
