@@ -6,7 +6,7 @@
       >
         <div>
           <h2 class="text-base font-semibold leading-7 text-zinc-800">All Blogs</h2>
-          <p class="mt-1 text-sm leading-6 text-gray-400">
+          <p class="mt-1 text-sm leading-6 text-zinc-400">
             Here you can see all the blogs you have created. You can also edit or delete them.
           </p>
           <RouterLink
@@ -36,8 +36,9 @@
                   >
                     <DropdownMenuItem
                       class="w-full bg-zinc-100 hover:bg-zinc-200 focus:bg-zinc-100 focus:outline-none rounded-sm p-1 text-sm text-zinc-700 cursor-pointer"
-                      >Edit</DropdownMenuItem
                     >
+                      Edit
+                    </DropdownMenuItem>
                     <DropdownMenuItem v-on:select="(e) => e.preventDefault()">
                       <RemoveBlogDialog :blogId="blog.id" />
                     </DropdownMenuItem>
@@ -58,11 +59,75 @@
                     {{ tag }}
                   </span>
                 </div>
-                <p class="mt-1 text-sm leading-6 text-gray-400">
+                <p class="mt-1 text-sm leading-6 text-zinc-400">
                   {{ blog.content.summary }}
                 </p>
               </div>
             </div>
+          </div>
+
+          <div v-if="totalPages > 1" class="mt-8 flex justify-center">
+            <PaginationRoot
+              :total="totalItemsCount ?? 0"
+              :siblingCount="1"
+              class="flex items-center gap-2"
+            >
+              <PaginationList v-slot="{ items }" class="flex items-center gap-2">
+                <PaginationFirst
+                  @click="changePage(1)"
+                  :disabled="currentPage === 1"
+                  class="inline-flex items-center justify-center rounded-md border bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-400 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  First
+                </PaginationFirst>
+                <PaginationPrev
+                  @click="changePage(currentPage - 1)"
+                  :disabled="currentPage === 1"
+                  class="inline-flex items-center justify-center rounded-md border bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-400 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Previous
+                </PaginationPrev>
+
+                <template v-for="(page, index) in items">
+                  <PaginationListItem
+                    v-if="page.type === 'page'"
+                    :value="page.value"
+                    class="inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm font-medium"
+                    :class="[
+                      page.value === currentPage
+                        ? 'border-zinc-900 bg-zinc-900 text-white'
+                        : 'border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50'
+                    ]"
+                    :key="index"
+                  >
+                    {{ page.value }}
+                  </PaginationListItem>
+                  <PaginationEllipsis
+                    v-else
+                    :key="page.type"
+                    :index="index"
+                    class="inline-flex items-center justify-center px-3 py-2 text-sm text-zinc-700"
+                  >
+                    &#8230;
+                  </PaginationEllipsis>
+                </template>
+
+                <PaginationNext
+                  @click="changePage(currentPage + 1)"
+                  :disabled="currentPage === totalPages"
+                  class="inline-flex items-center justify-center rounded-md border bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-400 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Next
+                </PaginationNext>
+                <PaginationLast
+                  @click="changePage(totalPages)"
+                  :disabled="currentPage === totalPages"
+                  class="inline-flex items-center justify-center rounded-md border bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-400 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Last
+                </PaginationLast>
+              </PaginationList>
+            </PaginationRoot>
           </div>
         </div>
       </div>
@@ -78,9 +143,17 @@ import {
   DropdownMenuItem,
   DropdownMenuPortal,
   DropdownMenuRoot,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
+  PaginationEllipsis,
+  PaginationFirst,
+  PaginationLast,
+  PaginationList,
+  PaginationListItem,
+  PaginationNext,
+  PaginationPrev,
+  PaginationRoot
 } from 'radix-vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 interface Blog {
   id: number
@@ -101,18 +174,55 @@ interface Blog {
 const loading = ref<boolean>(true)
 const blogs = ref<Blog[]>([])
 const error = ref<string | null>(null)
+const currentPage = ref<number>(1)
+const itemsPerPage = ref<number>(3)
+const totalPages = ref<number>(0)
+const totalItemsCount = ref<number | null>(null)
 
 async function getBlogs() {
   try {
-    const { data, error: supabaseError } = await supabase.from('blogs').select('*')
+    loading.value = true
+    const {
+      data,
+      count,
+      error: supabaseError
+    } = await supabase
+      .from('blogs')
+      .select('*', { count: 'exact' })
+      .range(
+        (currentPage.value - 1) * itemsPerPage.value,
+        (currentPage.value - 1) * itemsPerPage.value + itemsPerPage.value - 1
+      )
+
+      .order('created_at', { ascending: false })
+
     if (supabaseError) throw supabaseError
+
+    console.log('Toplam Blog Sayısı:', count)
+
+    totalItemsCount.value = count
     blogs.value = data as Blog[]
+    totalPages.value = Math.ceil((count ?? 0) / itemsPerPage.value)
   } catch (e) {
     error.value = (e as Error).message
   } finally {
     loading.value = false
   }
 }
+
+function changePage(newPage: number) {
+  if (newPage > 0 && newPage <= totalPages.value) {
+    currentPage.value = newPage
+    getBlogs()
+  }
+}
+
+watch(
+  () => currentPage.value,
+  () => {
+    getBlogs()
+  }
+)
 
 onMounted(() => {
   getBlogs()
