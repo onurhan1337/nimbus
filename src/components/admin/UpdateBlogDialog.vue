@@ -13,7 +13,6 @@ import {
 } from 'radix-vue'
 import { useForm } from 'vee-validate'
 import { defineComponent, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import * as zod from 'zod'
 
@@ -63,7 +62,6 @@ export default defineComponent({
   },
   emits: ['update-complete', 'close'],
   setup(props, { emit }) {
-    const router = useRouter()
     const authStore = useAuthStore()
     const categories = ref<Category[]>([])
 
