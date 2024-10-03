@@ -3,16 +3,14 @@ import { supabase } from '@/lib/supabaseClient'
 import { useAuthStore } from '@/stores/auth'
 import {
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogOverlay,
   AlertDialogPortal,
   AlertDialogRoot,
-  AlertDialogTitle,
-  AlertDialogTrigger
+  AlertDialogTitle
 } from 'radix-vue'
-import { defineProps } from 'vue'
+import { defineEmits } from 'vue'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 
@@ -20,8 +18,17 @@ const props = defineProps({
   blogId: {
     type: Number,
     required: true
+  },
+  open: {
+    type: Boolean,
+    required: true
   }
 })
+
+const emit = defineEmits<{
+  'remove-complete': []
+  close: []
+}>()
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -30,23 +37,23 @@ if (!authStore.checkAdmin) throw new Error('You must be an admin to remove a blo
 
 const handleRemove = async () => {
   const { error } = await supabase.from('blogs').delete().eq('id', props.blogId)
-  if (error) toast.error('Error removing blog!')
-  else {
+  if (error) {
+    toast.error('Error removing blog!')
+    emit('close')
+  } else {
     toast.success('Blog removed successfully!')
+    emit('remove-complete')
     router.push('/admin')
   }
+}
+
+const handleClose = () => {
+  emit('close')
 }
 </script>
 
 <template>
-  <AlertDialogRoot>
-    <AlertDialogTrigger
-      class="w-full bg-zinc-100 hover:bg-zinc-200 focus:bg-zinc-100 focus:outline-none rounded-sm p-1 text-sm text-zinc-700 cursor-pointer"
-      :as-child="true"
-    >
-      <button class="flex">Remove</button>
-    </AlertDialogTrigger>
-
+  <AlertDialogRoot :open="open" @update:open="handleClose">
     <AlertDialogPortal>
       <AlertDialogOverlay
         class="bg-blackA9 data-[state=open]:animate-overlayShow fixed inset-0 z-30"
@@ -61,15 +68,16 @@ const handleRemove = async () => {
           This action cannot be undone. This will permanently delete your account and remove your
           blog from our servers.
         </AlertDialogDescription>
-        <div class="flex justify-end gap-[25px]">
-          <AlertDialogCancel
-            class="text-mauve11 bg-mauve4 hover:bg-mauve5 focus:shadow-mauve7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none outline-none focus:shadow-[0_0_0_2px]"
+        <div class="flex justify-end gap-2">
+          <button
+            @click="handleClose"
+            class="text-zinc-900 bg-white border border-zinc-300 focus:outline-none hover:bg-zinc-100 focus:ring-4 focus:ring-zinc-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-zinc-800 dark:text-white dark:border-zinc-600 dark:hover:bg-zinc-700 dark:hover:border-zinc-600 dark:focus:ring-zinc-700"
           >
             Cancel
-          </AlertDialogCancel>
+          </button>
           <AlertDialogAction
             @click="handleRemove"
-            class="text-red11 bg-red4 hover:bg-red5 focus:shadow-red7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none outline-none focus:shadow-[0_0_0_2px]"
+            class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
           >
             Yes, delete blog
           </AlertDialogAction>
