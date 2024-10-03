@@ -1,3 +1,119 @@
+<script setup lang="ts">
+import { supabase } from '@/lib/supabaseClient'
+import { EllipsisHorizontalIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuRoot,
+  DropdownMenuTrigger,
+  PaginationEllipsis,
+  PaginationFirst,
+  PaginationLast,
+  PaginationList,
+  PaginationListItem,
+  PaginationNext,
+  PaginationPrev,
+  PaginationRoot
+} from 'radix-vue'
+import { onMounted, ref, watch } from 'vue'
+
+interface Blog {
+  id: number
+  title: string
+  category_id: number
+  content: {
+    author: string
+    markdown: string
+    tags: string[]
+    summary: string
+    cover_image: string
+  }
+  user_id: number
+  created_at: string
+  updated_at: string
+}
+
+const loading = ref<boolean>(true)
+const blogs = ref<Blog[]>([])
+const error = ref<string | null>(null)
+const currentPage = ref<number>(1)
+const itemsPerPage = ref<number>(3)
+const totalPages = ref<number>(0)
+const totalItemsCount = ref<number | null>(null)
+
+const selectedBlogId = ref<number | null>(null)
+const isUpdateDialogOpen = ref(false)
+const isRemoveDialogOpen = ref(false)
+
+const openUpdateDialog = (blogId: number) => {
+  selectedBlogId.value = blogId
+  isUpdateDialogOpen.value = true
+}
+
+const openRemoveDialog = (blogId: number) => {
+  selectedBlogId.value = blogId
+  isRemoveDialogOpen.value = true
+}
+
+async function getBlogs() {
+  try {
+    loading.value = true
+    const {
+      data,
+      count,
+      error: supabaseError
+    } = await supabase
+      .from('blogs')
+      .select('*', { count: 'exact' })
+      .range(
+        (currentPage.value - 1) * itemsPerPage.value,
+        (currentPage.value - 1) * itemsPerPage.value + itemsPerPage.value - 1
+      )
+
+      .order('created_at', { ascending: false })
+
+    if (supabaseError) throw supabaseError
+
+    totalItemsCount.value = count
+    blogs.value = data as Blog[]
+    totalPages.value = Math.ceil((count ?? 0) / itemsPerPage.value)
+  } catch (e) {
+    error.value = (e as Error).message
+  } finally {
+    loading.value = false
+  }
+}
+
+function changePage(newPage: number) {
+  if (newPage > 0 && newPage <= totalPages.value) {
+    currentPage.value = newPage
+    getBlogs()
+  }
+}
+
+function handleBlogUpdated() {
+  getBlogs()
+  isUpdateDialogOpen.value = false
+}
+
+function handleBlogRemoved() {
+  getBlogs()
+  isRemoveDialogOpen.value = false
+}
+
+watch(
+  () => currentPage.value,
+  () => {
+    getBlogs()
+  }
+)
+
+onMounted(() => {
+  getBlogs()
+})
+</script>
+
 <template>
   <section>
     <div class="divide-y divide-white/5">
@@ -25,7 +141,9 @@
           >
             <div class="w-full flex justify-end">
               <DropdownMenuRoot>
-                <DropdownMenuTrigger class="flex items-center justify-between">
+                <DropdownMenuTrigger
+                  class="flex items-center justify-between focus:outline-none focus:ring-1 focus:ring-inset focus:ring-slate-400 rounded-md"
+                >
                   <EllipsisHorizontalIcon class="h-5 w-5" />
                 </DropdownMenuTrigger>
                 <DropdownMenuPortal>
@@ -34,13 +152,21 @@
                     side="right"
                     class="w-48 border rounded-sm bg-white shadow-lg"
                   >
-                    <DropdownMenuItem
-                      class="w-full bg-zinc-100 hover:bg-zinc-200 focus:bg-zinc-100 focus:outline-none rounded-sm p-1 text-sm text-zinc-700 cursor-pointer"
-                    >
-                      Edit
+                    <DropdownMenuItem @click="openUpdateDialog(blog.id)">
+                      <button
+                        class="w-full flex items-center gap-x-2 bg-zinc-100 hover:bg-zinc-200 focus:bg-zinc-100 focus:outline-none rounded-sm p-1 text-sm text-zinc-700 cursor-pointer"
+                      >
+                        <PencilSquareIcon class="size-4 text-slate-400" />
+                        <span>Edit</span>
+                      </button>
                     </DropdownMenuItem>
-                    <DropdownMenuItem v-on:select="(e) => e.preventDefault()">
-                      <RemoveBlogDialog :blogId="blog.id" />
+                    <DropdownMenuItem @click="openRemoveDialog(blog.id)">
+                      <button
+                        class="w-full flex items-center gap-x-2 bg-zinc-100 hover:bg-zinc-200 focus:bg-zinc-100 focus:outline-none rounded-sm p-1 text-sm text-zinc-700 cursor-pointer"
+                      >
+                        <TrashIcon class="size-4 text-slate-400" />
+                        <span>Remove</span>
+                      </button>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenuPortal>
@@ -134,99 +260,20 @@
         </div>
       </div>
     </div>
+    <UpdateBlogDialog
+      v-if="selectedBlogId"
+      :blogId="selectedBlogId"
+      :open="isUpdateDialogOpen"
+      @update-complete="handleBlogUpdated"
+      @close="isUpdateDialogOpen = false"
+    />
+
+    <RemoveBlogDialog
+      v-if="selectedBlogId"
+      :blogId="selectedBlogId"
+      :open="isRemoveDialogOpen"
+      @remove-complete="handleBlogRemoved"
+      @close="isRemoveDialogOpen = false"
+    />
   </section>
 </template>
-
-<script setup lang="ts">
-import { supabase } from '@/lib/supabaseClient'
-import { EllipsisHorizontalIcon } from '@heroicons/vue/24/outline'
-import {
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuRoot,
-  DropdownMenuTrigger,
-  PaginationEllipsis,
-  PaginationFirst,
-  PaginationLast,
-  PaginationList,
-  PaginationListItem,
-  PaginationNext,
-  PaginationPrev,
-  PaginationRoot
-} from 'radix-vue'
-import { onMounted, ref, watch } from 'vue'
-
-interface Blog {
-  id: number
-  title: string
-  category_id: number
-  content: {
-    author: string
-    markdown: string
-    tags: string[]
-    summary: string
-    cover_image: string
-  }
-  user_id: number
-  created_at: string
-  updated_at: string
-}
-
-const loading = ref<boolean>(true)
-const blogs = ref<Blog[]>([])
-const error = ref<string | null>(null)
-const currentPage = ref<number>(1)
-const itemsPerPage = ref<number>(3)
-const totalPages = ref<number>(0)
-const totalItemsCount = ref<number | null>(null)
-
-async function getBlogs() {
-  try {
-    loading.value = true
-    const {
-      data,
-      count,
-      error: supabaseError
-    } = await supabase
-      .from('blogs')
-      .select('*', { count: 'exact' })
-      .range(
-        (currentPage.value - 1) * itemsPerPage.value,
-        (currentPage.value - 1) * itemsPerPage.value + itemsPerPage.value - 1
-      )
-
-      .order('created_at', { ascending: false })
-
-    if (supabaseError) throw supabaseError
-
-    console.log('Toplam Blog Sayısı:', count)
-
-    totalItemsCount.value = count
-    blogs.value = data as Blog[]
-    totalPages.value = Math.ceil((count ?? 0) / itemsPerPage.value)
-  } catch (e) {
-    error.value = (e as Error).message
-  } finally {
-    loading.value = false
-  }
-}
-
-function changePage(newPage: number) {
-  if (newPage > 0 && newPage <= totalPages.value) {
-    currentPage.value = newPage
-    getBlogs()
-  }
-}
-
-watch(
-  () => currentPage.value,
-  () => {
-    getBlogs()
-  }
-)
-
-onMounted(() => {
-  getBlogs()
-})
-</script>
