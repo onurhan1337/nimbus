@@ -17,7 +17,17 @@
 
       <!-- Category -->
       <div class="col-span-2 sm:col-span-1">
-        <label for="category_id" class="block text-sm font-medium text-gray-700">Category</label>
+        <div class="flex items-center justify-between">
+          <label for="category_id" class="block text-sm font-medium text-gray-700">Category</label>
+          <button
+            type="button"
+            aria-label="Add Category"
+            @click="openAddCategoryDialog"
+            class="text-sm text-blue-500 hover:text-blue-700 focus:outline-none"
+          >
+            Add Category
+          </button>
+        </div>
         <select
           v-bind="categoryIdAttrs"
           v-model="categoryId"
@@ -115,6 +125,7 @@
       </div>
     </form>
   </div>
+  <AddCategoryDialog v-model:open="isAddCategoryDialogOpen" @category-added="getCategories" />
 </template>
 
 <script lang="ts">
@@ -158,13 +169,23 @@ export default defineComponent({
     const authStore = useAuthStore()
 
     const categories = ref<Category[]>([])
+    const isAddCategoryDialogOpen = ref<boolean>(false)
     const user = authStore.user as User | null
     const userId = user?.id || ''
 
+    function openAddCategoryDialog() {
+      isAddCategoryDialogOpen.value = true
+    }
+
     async function getCategories() {
-      const { data, error } = await supabase.from('categories').select('*')
-      if (error) throw error
-      categories.value = data
+      try {
+        const { data, error } = await supabase.from('categories').select('*')
+        if (error) throw error
+        categories.value = data
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+        toast.error('Failed to fetch categories')
+      }
     }
 
     onMounted(async () => {
@@ -235,6 +256,9 @@ export default defineComponent({
       errors,
       onSubmit,
       categories,
+      getCategories,
+      isAddCategoryDialogOpen,
+      openAddCategoryDialog,
       schema: toTypedSchema(blogSchema)
     }
   }
