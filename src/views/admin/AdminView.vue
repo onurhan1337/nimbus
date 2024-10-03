@@ -1,6 +1,6 @@
 <template>
-  <div class="xl:pl-72">
-    <header class="border bg-zinc-100/90">
+  <div class="w-full">
+    <header class="w-full border bg-zinc-100/90">
       <nav class="flex overflow-x-auto py-4">
         <ul
           role="list"
@@ -16,9 +16,8 @@
         </ul>
       </nav>
     </header>
-
-    <BlogsSection />
   </div>
+  <BlogsSection />
 </template>
 
 <script lang="ts" setup>
@@ -26,6 +25,7 @@ import BlogsSection from '@/components/admin/BlogsSection.vue'
 
 import { RouterLink } from 'vue-router'
 
+// TODO: Update current prop to match the current route
 const SECONDARY_NAVIGATION = [
   { name: 'Blogs', href: '/admin/blogs', current: true },
   { name: 'Users', href: '/admin/users', current: false }
