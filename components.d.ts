@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AddCategoryDialog: typeof import('./src/components/admin/AddCategoryDialog.vue')['default']
     BlogsSection: typeof import('./src/components/admin/BlogsSection.vue')['default']
     CreateBlog: typeof import('./src/components/admin/CreateBlog.vue')['default']
     DialogClose: typeof import('radix-vue')['DialogClose']
