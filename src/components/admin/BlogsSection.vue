@@ -115,12 +115,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <section>
-    <div class="divide-y divide-white/5">
+  <section class="w-full">
+    <div class="w-full divide-y divide-white/5">
       <div
-        class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8"
+        class="grid w-full grid-cols-3 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8 jusfiy-between"
       >
-        <div>
+        <div class="col-span-3 md:col-span-1 space-y-2">
           <h2 class="text-base font-semibold leading-7 text-zinc-800">All Blogs</h2>
           <p class="mt-1 text-sm leading-6 text-zinc-400">
             Here you can see all the blogs you have created. You can also edit or delete them.
@@ -133,7 +133,7 @@ onMounted(() => {
           </RouterLink>
         </div>
 
-        <div class="md:col-span-2">
+        <div class="col-span-3 md:col-span-2 space-y-2">
           <div
             v-for="blog in blogs"
             :key="blog.id"
@@ -180,8 +180,10 @@ onMounted(() => {
                 <h6 class="text-sm text-zinc-500">
                   {{ blog.content.author }} - {{ blog.created_at.split('T')[0] }}
                 </h6>
-                <div v-for="(tag, index) in blog.content.tags" :key="index">
+                <div class="flex flex-wrap gap-2">
                   <span
+                    v-for="(tag, index) in blog.content.tags"
+                    :key="index"
                     class="inline-block bg-zinc-100 text-zinc-700 border rounded-full px-3 py-1 text-xs font-semibold tracking-wide"
                   >
                     {{ tag }}
