@@ -1,6 +1,7 @@
 <script lang="ts">
 import { supabase } from '@/lib/supabaseClient'
 import { useAuthStore } from '@/stores/auth'
+import type { Category } from '@/types'
 import { toTypedSchema } from '@vee-validate/zod'
 import {
   DialogClose,
@@ -32,12 +33,6 @@ const blogSchema = zod.object({
 })
 
 type BlogFormValues = zod.infer<typeof blogSchema>
-
-interface Category {
-  id: number
-  name: string
-  description?: string
-}
 
 export default defineComponent({
   name: 'UpdateBlogDialog',

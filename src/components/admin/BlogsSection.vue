@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { supabase } from '@/lib/supabaseClient'
+import type { Blog } from '@/types'
 import { EllipsisHorizontalIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import {
   DropdownMenuContent,
@@ -17,22 +18,6 @@ import {
   PaginationRoot
 } from 'radix-vue'
 import { onMounted, ref, watch } from 'vue'
-
-interface Blog {
-  id: number
-  title: string
-  category_id: number
-  content: {
-    author: string
-    markdown: string
-    tags: string[]
-    summary: string
-    cover_image: string
-  }
-  user_id: number
-  created_at: string
-  updated_at: string
-}
 
 const loading = ref<boolean>(true)
 const blogs = ref<Blog[]>([])
