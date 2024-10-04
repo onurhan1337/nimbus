@@ -14,12 +14,17 @@
           <Bars3Icon class="h-6 w-6" aria-hidden="true" />
         </button>
       </div>
-      <PopoverGroup class="hidden lg:flex lg:gap-x-12">
+      <PopoverGroup class="hidden lg:flex lg:gap-x-4">
         <RouterLink
-          :to="item.href"
-          class="text-sm font-semibold leading-6 text-zinc-900"
           v-for="item in NAV_ITEMS"
           :key="item.name"
+          :to="item.href"
+          :class="[
+            'text-sm font-semibold leading-6 px-4 py-1 rounded-md border border-transparent',
+            route.path === item.href
+              ? 'text-blue-600 bg-zinc-200 border-zinc-300'
+              : 'text-zinc-900 hover:text-zinc-700'
+          ]"
         >
           {{ item.name }}
         </RouterLink>
@@ -68,18 +73,17 @@
             <div class="space-y-2 py-6" v-for="item in NAV_ITEMS" :key="item.name">
               <RouterLink
                 :to="item.href"
-                class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-zinc-900 hover:bg-zinc-50"
+                :class="[
+                  '-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7',
+                  route.path === item.href
+                    ? 'bg-zinc-100 text-blue-600'
+                    : 'text-zinc-900 hover:bg-zinc-50'
+                ]"
               >
                 {{ item.name }}
               </RouterLink>
             </div>
             <div class="py-6">
-              <RouterLink
-                v-if="!authStore.isAuthenticated"
-                to="/auth"
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none"
-                >Login <span aria-hidden="true">&rarr;</span></RouterLink
-              >
               <RouterLink
                 v-if="!authStore.isAuthenticated"
                 to="/auth"
@@ -114,11 +118,11 @@ import { useAuthStore } from '@/stores/auth'
 import { Dialog, DialogPanel, PopoverGroup } from '@headlessui/vue'
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { onMounted, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 
 const mobileMenuOpen = ref(false)
-
 const authStore = useAuthStore()
+const route = useRoute()
 
 const NAV_ITEMS = [
   { name: 'Home', href: '/' },
