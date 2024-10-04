@@ -1,5 +1,5 @@
 <p align="center">
-<img src="./src/assets/nimbus-logo.png" width='128' height='128' />
+<img src="./src/assets/nimbus-logo.png" width='256' height='256' /> 
 </p>
 
 # Nimbus
