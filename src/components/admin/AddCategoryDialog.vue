@@ -11,7 +11,6 @@ import {
   DialogTitle
 } from 'radix-vue'
 import { useForm } from 'vee-validate'
-import { defineEmits } from 'vue'
 import { toast } from 'vue-sonner'
 import { z } from 'zod'
 

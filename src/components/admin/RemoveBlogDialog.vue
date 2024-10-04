@@ -10,7 +10,6 @@ import {
   AlertDialogRoot,
   AlertDialogTitle
 } from 'radix-vue'
-import { defineEmits } from 'vue'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 
