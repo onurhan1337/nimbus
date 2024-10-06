@@ -245,7 +245,7 @@ onMounted(() => {
                     {{ blog.content.summary }}
                   </p>
                 </div>
-                <RouterLink :to="`/blog/${blog.id}`" class="col-span-4 w-full">
+                <RouterLink :to="`/blog/${blog.slug}`" class="col-span-4 w-full">
                   <button
                     class="w-full bg-gradient-to-br from-neutral-100 to-zinc-200 text-zinc-500 px-4 text-sm font-medium rounded border border-zinc-300/50 hover:opacity-90 shadow-sm mt-4 py-1"
                   >
