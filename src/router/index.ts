@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import { useAuthStore } from '../stores/auth' // Make sure this path is correct
+import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,17 +25,24 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: () => import('../views//admin/AdminView.vue'),
-      meta: {
-        requiresAdmin: true
-      }
-    },
-    {
-      path: '/admin/blogs/create',
-      name: 'create-blog',
-      component: () => import('../views/admin/blogs/CreateView.vue'),
-      meta: {
-        requiresAdmin: true
-      }
+      children: [
+        {
+          path: '',
+          name: 'admin-blogs',
+          component: () => import('../views/admin/blogs/BlogsView.vue'),
+          meta: {
+            requiresAdmin: true
+          }
+        },
+        {
+          path: 'categories',
+          name: 'admin-categories',
+          component: () => import('../views/admin/categories/CategoriesView.vue'),
+          meta: {
+            requiresAdmin: true
+          }
+        }
+      ]
     },
     {
       path: '/:pathMatch(.*)*',

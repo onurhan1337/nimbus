@@ -22,12 +22,12 @@
         </ul>
       </nav>
     </header>
+
+    <router-view />
   </div>
-  <BlogsSection />
 </template>
 
 <script lang="ts" setup>
-import BlogsSection from '@/components/admin/BlogsSection.vue'
 import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
@@ -35,7 +35,8 @@ const route = useRoute()
 
 const NAVIGATION = [
   { name: 'Blogs', href: '/admin' },
-  { name: 'Users', href: '/admin/users' }
+  { name: 'Users', href: '/admin/users' },
+  { name: 'Categories', href: '/admin/categories' }
 ]
 
 const navigationItems = computed(() => NAVIGATION)
