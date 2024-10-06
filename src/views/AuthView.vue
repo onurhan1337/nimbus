@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useAuthStore } from '@/stores/auth'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 const authStore = useAuthStore()
 
@@ -8,10 +8,50 @@ const email = ref('')
 const password = ref('')
 const isLoginView = ref(true)
 
+watch(
+  () => authStore.email,
+  (newValue) => {
+    if (newValue !== email.value) {
+      email.value = newValue
+    }
+  }
+)
+
+watch(
+  () => authStore.password,
+  (newValue) => {
+    if (newValue !== password.value) {
+      password.value = newValue
+    }
+  }
+)
+
+watch(
+  () => email.value,
+  (newValue) => {
+    authStore.email = newValue
+  }
+)
+
+watch(
+  () => password.value,
+  (newValue) => {
+    authStore.password = newValue
+  }
+)
+
 function toggleView() {
   isLoginView.value = !isLoginView.value
-  email.value = ''
-  password.value = ''
+  authStore.email = ''
+  authStore.password = ''
+}
+
+async function handleSubmit() {
+  if (isLoginView.value) {
+    await authStore.login()
+  } else {
+    await authStore.register()
+  }
 }
 </script>
 
@@ -24,10 +64,7 @@ function toggleView() {
             {{ isLoginView ? 'Login' : 'Register' }}
           </h2>
         </div>
-        <form
-          class="space-y-6"
-          @submit.prevent="isLoginView ? authStore.login() : authStore.register()"
-        >
+        <form class="space-y-6" @submit.prevent="handleSubmit">
           <div>
             <label for="email" class="block text-sm font-medium text-zinc-700">
               Email address
@@ -39,7 +76,7 @@ function toggleView() {
                 type="email"
                 autocomplete="email"
                 required
-                v-model="email"
+                v-model="authStore.email"
                 class="appearance-none block w-full px-3 py-2 border border-zinc-300 rounded-md shadow-sm placeholder-zinc-400 focus:outline-none focus:ring-blue-500 focus:border-blue-700 sm:text-sm"
               />
             </div>
@@ -53,7 +90,7 @@ function toggleView() {
                 type="password"
                 autocomplete="current-password"
                 required
-                v-model="password"
+                v-model="authStore.password"
                 class="appearance-none block w-full px-3 py-2 border border-zinc-300 rounded-md shadow-sm placeholder-zinc-400 focus:outline-none focus:ring-blue-700 focus:border-blue-700 sm:text-sm"
               />
             </div>
