@@ -7,9 +7,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AddCategoryDialog: typeof import('./src/components/admin/AddCategoryDialog.vue')['default']
+    AddCategoryDialog: typeof import('./src/components/admin/categories/AddCategoryDialog.vue')['default']
     BlogsList: typeof import('./src/components/blog/BlogsList.vue')['default']
     BlogsSection: typeof import('./src/components/admin/BlogsSection.vue')['default']
+    CategoriesTable: typeof import('./src/components/admin/categories/CategoriesTable.vue')['default']
     CreateBlog: typeof import('./src/components/admin/CreateBlog.vue')['default']
     DialogClose: typeof import('radix-vue')['DialogClose']
     DialogContent: typeof import('radix-vue')['DialogContent']
@@ -20,9 +21,12 @@ declare module 'vue' {
     DialogTitle: typeof import('radix-vue')['DialogTitle']
     NavBar: typeof import('./src/components/navBar.vue')['default']
     RemoveBlogDialog: typeof import('./src/components/admin/RemoveBlogDialog.vue')['default']
+    RemoveCategoryDialog: typeof import('./src/components/admin/categories/RemoveCategoryDialog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SelectViewport: typeof import('radix-vue')['SelectViewport']
     UpdateBlogDialog: typeof import('./src/components/admin/UpdateBlogDialog.vue')['default']
+    UpdateCategoryDialog: typeof import('./src/components/admin/categories/UpdateCategoryDialog.vue')['default']
     UsersSection: typeof import('./src/components/admin/UsersSection.vue')['default']
     WelcomeItem: typeof import('./src/components/WelcomeItem.vue')['default']
   }
