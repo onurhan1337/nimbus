@@ -10,6 +10,7 @@ export type Blog = {
     cover_image: string
   }
   user_id: number
+  slug: string
   created_at: string
   updated_at: string
 }

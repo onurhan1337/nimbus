@@ -1,5 +1,6 @@
 <script lang="ts">
 import { supabase } from '@/lib/supabaseClient'
+import { slugify } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth'
 import type { Category } from '@/types'
 import { toTypedSchema } from '@vee-validate/zod'
@@ -20,6 +21,7 @@ import * as zod from 'zod'
 const blogSchema = zod.object({
   title: zod.string().min(3, 'Title must be at least 3 characters long.'),
   category_id: zod.number().int().positive('Category must be a positive number.'),
+  slug: zod.string(),
   content: zod.object({
     author: zod.string().min(2, 'Author name must be at least 2 characters long.'),
     markdown: zod.string().min(10, 'Markdown content must be at least 10 characters long.'),
@@ -76,6 +78,7 @@ export default defineComponent({
     const [markdown, markdownAttrs] = defineField('content.markdown')
     const [tags, tagsAttrs] = defineField('content.tags')
     const [coverImage, coverImageAttrs] = defineField('content.cover_image')
+    const [slug, slugAttrs] = defineField('slug')
 
     async function getCategories() {
       const { data, error } = await supabase.from('categories').select('*')
@@ -96,6 +99,7 @@ export default defineComponent({
         setValues({
           title: data.title,
           category_id: data.category_id,
+          slug: data.slug,
           content: {
             author: data.content.author,
             markdown: data.content.markdown,
@@ -124,6 +128,7 @@ export default defineComponent({
           .update({
             title: values.title,
             category_id: values.category_id,
+            slug: values.slug,
             content: {
               author: values.content.author,
               markdown: values.content.markdown,
@@ -180,6 +185,9 @@ export default defineComponent({
       markdownAttrs,
       tagsAttrs,
       coverImageAttrs,
+      slug,
+      slugify,
+      slugAttrs,
       errors,
       handleClose,
       onSubmit,
@@ -322,6 +330,29 @@ export default defineComponent({
             <span v-if="errors['content.cover_image']" class="text-sm text-red-500">{{
               errors['content.cover_image']
             }}</span>
+          </div>
+
+          <div class="col-span-2 sm:col-span-1">
+            <label for="slug" class="block text-sm font-medium text-gray-700">Slug</label>
+            <input
+              v-bind="slugAttrs"
+              v-model="slug"
+              type="text"
+              id="slug"
+              class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-600 focus:border-blue-600 sm:text-sm"
+              placeholder="Enter a unique slug for your blog post"
+            />
+            <div class="flex flex-col items-start">
+              <button
+                type="button"
+                class="mt-2 text-sm text-blue-500 hover:text-blue-700 focus:outline-none"
+                @click="slug = slugify(title)"
+                :disabled="slugAttrs.disabled"
+              >
+                Generate Slug
+              </button>
+              <span v-if="errors['slug']" class="text-sm text-red-500">{{ errors['slug'] }}</span>
+            </div>
           </div>
 
           <div class="col-span-2 flex justify-end gap-2">

@@ -115,6 +115,26 @@
         />
       </div>
 
+      <div class="col-span-2 sm:col-span-1">
+        <label for="slug" class="block text-sm font-medium text-gray-700">Slug</label>
+        <input
+          v-bind="slugAttrs"
+          v-model="slug"
+          type="text"
+          id="slug"
+          class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-600 focus:border-blue-600 sm:text-sm"
+          placeholder="Enter a unique slug for your blog post"
+        />
+        <button
+          type="button"
+          class="mt-2 text-sm text-blue-500 hover:text-blue-700 focus:outline-none"
+          @click="slug = slugify(title)"
+          :disabled="slugAttrs.disabled"
+        >
+          Generate Slug
+        </button>
+      </div>
+
       <div class="col-span-2 flex justify-end">
         <button
           type="submit"
@@ -130,6 +150,7 @@
 
 <script lang="ts">
 import { supabase } from '@/lib/supabaseClient'
+import { slugify } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth'
 import type { User } from '@supabase/supabase-js'
 import { toTypedSchema } from '@vee-validate/zod'
@@ -151,7 +172,8 @@ const blogSchema = zod.object({
       .refine((val) => val.length > 0, 'Tags cannot be empty.'),
     summary: zod.string().optional(),
     cover_image: zod.string().url('Cover image must be a valid URL.').optional()
-  })
+  }),
+  slug: zod.string()
 })
 
 type BlogFormValues = zod.infer<typeof blogSchema>
@@ -203,6 +225,7 @@ export default defineComponent({
     const [markdown, markdownAttrs] = defineField('content.markdown')
     const [tags, tagsAttrs] = defineField('content.tags')
     const [coverImage, coverImageAttrs] = defineField('content.cover_image')
+    const [slug, slugAttrs] = defineField('slug')
 
     const onSubmit = handleSubmit(async (values: BlogFormValues) => {
       try {
@@ -219,6 +242,7 @@ export default defineComponent({
             user_id: userId,
             title: values.title,
             category_id: values.category_id,
+            slug: values.slug,
             content: {
               author: values.content.author,
               markdown: values.content.markdown,
@@ -252,7 +276,10 @@ export default defineComponent({
       summaryAttrs,
       markdownAttrs,
       tagsAttrs,
+      slug,
+      slugify,
       coverImageAttrs,
+      slugAttrs,
       errors,
       onSubmit,
       categories,
