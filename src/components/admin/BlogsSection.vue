@@ -120,63 +120,73 @@ onMounted(() => {
 
         <div class="col-span-3 md:col-span-2 space-y-2">
           <div
-            v-for="blog in blogs"
-            :key="blog.id"
-            class="mb-8 p-4 rounded-lg border bg-gradient-to-br from-neutral-50 to-zinc-50"
+            v-if="blogs.length === 0"
+            class="p-4 rounded-lg border bg-gradient-to-br from-neutral-50 to-zinc-50"
           >
-            <div class="w-full flex justify-end">
-              <DropdownMenuRoot>
-                <DropdownMenuTrigger
-                  class="flex items-center justify-between focus:outline-none focus:ring-1 focus:ring-inset focus:ring-slate-400 rounded-md"
-                >
-                  <EllipsisHorizontalIcon class="h-5 w-5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuContent
-                    align="start"
-                    side="right"
-                    class="w-48 border rounded-sm bg-white shadow-lg"
-                  >
-                    <DropdownMenuItem @click="openUpdateDialog(blog.id)">
-                      <button
-                        class="w-full flex items-center gap-x-2 bg-zinc-100 hover:bg-zinc-200 focus:bg-zinc-100 focus:outline-none rounded-sm p-1 text-sm text-zinc-700 cursor-pointer"
-                      >
-                        <PencilSquareIcon class="size-4 text-slate-400" />
-                        <span>Edit</span>
-                      </button>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem @click="openRemoveDialog(blog.id)">
-                      <button
-                        class="w-full flex items-center gap-x-2 bg-zinc-100 hover:bg-zinc-200 focus:bg-zinc-100 focus:outline-none rounded-sm p-1 text-sm text-zinc-700 cursor-pointer"
-                      >
-                        <TrashIcon class="size-4 text-slate-400" />
-                        <span>Remove</span>
-                      </button>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenuPortal>
-              </DropdownMenuRoot>
-            </div>
+            <h3 class="text-lg text-center text-zinc-500">
+              No blogs available. Create your first blog!
+            </h3>
+          </div>
+          <div v-else>
             <div
-              class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6 overflow-hidden break-words whitespace-normal"
+              v-for="blog in blogs"
+              :key="blog.id"
+              class="mb-8 p-4 rounded-lg border bg-gradient-to-br from-neutral-50 to-zinc-50"
             >
-              <div class="col-span-full space-y-2">
-                <h2 class="text-2xl font-bold">{{ blog.title }}</h2>
-                <h6 class="text-sm text-zinc-500">
-                  {{ blog.content.author }} - {{ blog.created_at.split('T')[0] }}
-                </h6>
-                <div class="flex flex-wrap gap-2">
-                  <span
-                    v-for="(tag, index) in blog.content.tags"
-                    :key="index"
-                    class="inline-block bg-zinc-100 text-zinc-700 border rounded-full px-3 py-1 text-xs font-semibold tracking-wide"
+              <div class="w-full flex justify-end">
+                <DropdownMenuRoot>
+                  <DropdownMenuTrigger
+                    class="flex items-center justify-between focus:outline-none focus:ring-1 focus:ring-inset focus:ring-slate-400 rounded-md"
                   >
-                    {{ tag }}
-                  </span>
+                    <EllipsisHorizontalIcon class="h-5 w-5" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuContent
+                      align="start"
+                      side="right"
+                      class="w-48 border rounded-sm bg-white shadow-lg"
+                    >
+                      <DropdownMenuItem @click="openUpdateDialog(blog.id)">
+                        <button
+                          class="w-full flex items-center gap-x-2 bg-zinc-100 hover:bg-zinc-200 focus:bg-zinc-100 focus:outline-none rounded-sm p-1 text-sm text-zinc-700 cursor-pointer"
+                        >
+                          <PencilSquareIcon class="size-4 text-slate-400" />
+                          <span>Edit</span>
+                        </button>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem @click="openRemoveDialog(blog.id)">
+                        <button
+                          class="w-full flex items-center gap-x-2 bg-zinc-100 hover:bg-zinc-200 focus:bg-zinc-100 focus:outline-none rounded-sm p-1 text-sm text-zinc-700 cursor-pointer"
+                        >
+                          <TrashIcon class="size-4 text-slate-400" />
+                          <span>Remove</span>
+                        </button>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuRoot>
+              </div>
+              <div
+                class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6 overflow-hidden break-words whitespace-normal"
+              >
+                <div class="col-span-full space-y-2">
+                  <h2 class="text-2xl font-bold">{{ blog.title }}</h2>
+                  <h6 class="text-sm text-zinc-500">
+                    {{ blog.content.author }} - {{ blog.created_at.split('T')[0] }}
+                  </h6>
+                  <div class="flex flex-wrap gap-2">
+                    <span
+                      v-for="(tag, index) in blog.content.tags"
+                      :key="index"
+                      class="inline-block bg-zinc-100 text-zinc-700 border rounded-full px-3 py-1 text-xs font-semibold tracking-wide"
+                    >
+                      {{ tag }}
+                    </span>
+                  </div>
+                  <p class="mt-1 text-sm leading-6 text-zinc-400">
+                    {{ blog.content.summary }}
+                  </p>
                 </div>
-                <p class="mt-1 text-sm leading-6 text-zinc-400">
-                  {{ blog.content.summary }}
-                </p>
               </div>
             </div>
           </div>
