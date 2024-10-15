@@ -35,7 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function register() {
     try {
-      const { error } = await supabase.auth.signUp({
+      const { user, error } = await supabase.auth.signUp({
         email: email.value,
         password: password.value,
         options: {
@@ -46,8 +46,10 @@ export const useAuthStore = defineStore('auth', () => {
       })
 
       if (error) {
+        console.error('Registration error:', error)
         alert(error.message)
       } else {
+        console.log('User registered:', user)
         await checkSession()
         router.push('/')
       }
