@@ -128,12 +128,14 @@ onMounted(() => {
     <div class="w-full divide-y divide-white/5">
       <div class="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
         <div class="w-full mx-auto">
-          <div class="flex flex-col sm:flex-row justify-between items-center space-y-6 mb-12">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-end space-y-6 mb-12 bg-red-100"
+          >
             <h2 class="text-3xl font-semibold tracking-tight text-neutral-600 sm:text-4xl">
               Latest Blog Posts
             </h2>
 
-            <div class="w-auto flex flex-row justify-end gap-4">
+            <div class="w-auto flex flex-row gap-4">
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <MagnifyingGlassIcon class="h-5 w-5 text-zinc-400" />
