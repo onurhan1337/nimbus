@@ -35,6 +35,14 @@ const router = createRouter({
           }
         },
         {
+          path: 'blogs/create',
+          name: 'admin-blogs-create',
+          component: () => import('../views/admin/blogs/CreateView.vue'),
+          meta: {
+            requiresAdmin: true
+          }
+        },
+        {
           path: 'categories',
           name: 'admin-categories',
           component: () => import('../views/admin/categories/CategoriesView.vue'),
